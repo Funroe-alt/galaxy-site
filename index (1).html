@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Galaxy Client: a clean PvP and streamer client for Minecraft Java 26.2. Not an official Minecraft product.">
+<title>Galaxy Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: night-sky page; hero pairs the pitch with a live-looking F3 panel, then features, setup, FAQ, privacy. */
+:root {
+  color-scheme: dark;
+  --space: #0b0819;
+  --space-2: #120d29;
+  --panel: #18123a;
+  --line: #2e2563;
+  --text: #ece7ff;
+  --muted: #a69cd3;
+  --violet: #9b5cff;
+  --magenta: #e062ff;
+  --blue: #4fa3ff;
+  --font-display: "Unbounded", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--space);
+  color: var(--text);
+  font: 400 16px/1.6 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.wrap { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+a { color: var(--text); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--magenta); outline-offset: 3px; border-radius: 8px; }
+
+/* nav */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; backdrop-filter: blur(10px); background: color-mix(in srgb, var(--space) 75%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 700 17px/1 var(--font-display); letter-spacing: .02em; }
+.brand svg { width: 26px; height: 26px; }
+.nav ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+.nav ul a { text-decoration: none; color: var(--muted); font-weight: 500; font-size: 15px; }
+.nav ul a:hover { color: var(--text); }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; padding-block: 72px 56px; }
+.hero > * { min-width: 0; }
+.eyebrow { font: 600 12px/1 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--blue); }
+h1 { font: 700 clamp(44px, 7.4vw, 84px)/1 var(--font-display); letter-spacing: -.02em; margin: 14px 0 18px; text-wrap: balance;
+  background: linear-gradient(100deg, var(--text) 30%, var(--magenta) 70%, var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lede { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 28px; }
+.lede strong { color: var(--text); font-weight: 600; }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 999px; font: 600 15px/1 var(--font-body); text-decoration: none; border: 1px solid var(--line); transition: transform .15s ease, box-shadow .15s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: linear-gradient(135deg, var(--violet), var(--magenta)); border-color: transparent; color: #fff; box-shadow: 0 8px 30px -8px color-mix(in srgb, var(--magenta) 70%, transparent); }
+.btn-ghost { background: color-mix(in srgb, var(--panel) 70%, transparent); color: var(--text); }
+.meta { margin-top: 16px; font: 400 13px/1.4 var(--font-mono); color: var(--muted); }
+
+/* F3 preview */
+.f3 { background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); border-radius: 16px; padding: 18px 18px 14px; font: 400 13px/1 var(--font-mono); box-shadow: 0 30px 80px -30px color-mix(in srgb, var(--violet) 55%, transparent); }
+.f3-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.f3-fps { font: 700 22px/1 var(--font-display); background: linear-gradient(90deg, var(--magenta), var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.f3-ver { color: var(--muted); font-size: 12px; }
+.f3 section + section { margin-top: 12px; }
+.f3 h3 { margin: 0 0 6px; font: 600 11px/1 var(--font-mono); letter-spacing: .14em; color: var(--magenta); padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--violet) 35%, transparent); }
+.row { display: flex; justify-content: space-between; gap: 12px; padding-block: 4px; font-variant-numeric: tabular-nums; }
+.row span:first-child { color: var(--muted); }
+.row span:last-child { text-align: right; overflow-wrap: anywhere; }
+.f3-cap { margin: 10px 0 0; font: 400 12px/1.4 var(--font-body); color: var(--muted); }
+
+/* sections */
+section.block { padding-block: 56px; }
+h2 { font: 700 clamp(26px, 3.6vw, 38px)/1.1 var(--font-display); letter-spacing: -.01em; margin: 10px 0 14px; text-wrap: balance; }
+.sub { color: var(--muted); max-width: 40em; margin: 0 0 32px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.feat { background: color-mix(in srgb, var(--space-2) 85%, transparent); border: 1px solid var(--line); border-radius: 14px; padding: 22px; min-width: 0; }
+.feat h3 { margin: 12px 0 6px; font: 600 18px/1.25 var(--font-body); }
+.feat p { margin: 0; color: var(--muted); font-size: 15px; }
+.feat svg { width: 28px; height: 28px; color: var(--magenta); }
+.tag { display: inline-block; font: 600 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--blue); border: 1px solid color-mix(in srgb, var(--blue) 45%, transparent); border-radius: 999px; padding: 5px 9px; margin-top: 12px; }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: step; list-style: none; padding: 0; margin: 0; }
+.steps li { min-width: 0; border-top: 2px solid var(--violet); padding-top: 16px; }
+.steps li::before { counter-increment: step; content: "Step " counter(step); font: 600 12px/1 var(--font-mono); letter-spacing: .1em; color: var(--blue); text-transform: uppercase; }
+.steps h3 { margin: 10px 0 6px; font: 600 18px/1.3 var(--font-body); }
+.steps p { margin: 0; color: var(--muted); font-size: 15px; }
+.req { margin-top: 28px; display: flex; gap: 10px; flex-wrap: wrap; }
+.req span { font: 400 13px/1 var(--font-mono); padding: 8px 12px; border-radius: 8px; background: color-mix(in srgb, var(--panel) 80%, transparent); border: 1px solid var(--line); color: var(--muted); }
+
+details { border-bottom: 1px solid var(--line); padding-block: 16px; }
+details:first-of-type { border-top: 1px solid var(--line); }
+summary { cursor: pointer; font: 600 17px/1.4 var(--font-body); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--magenta); font: 600 20px/1 var(--font-mono); }
+details[open] summary::after { content: "\2212"; }
+details p { margin: 10px 0 0; color: var(--muted); max-width: 46em; }
+.faq { max-width: 780px; }
+
+.privacy { max-width: 780px; background: color-mix(in srgb, var(--space-2) 85%, transparent); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+.privacy h3 { margin: 22px 0 6px; font: 600 16px/1.3 var(--font-body); }
+.privacy p, .privacy li { color: var(--muted); font-size: 15px; }
+.privacy ul { padding-left: 20px; margin: 6px 0; }
+.updated { font: 400 12px/1 var(--font-mono); color: var(--muted); }
+.ph { color: var(--blue); }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: 13px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+footer p { margin: 0; max-width: 44em; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; padding-block: 48px 32px; gap: 32px; }
+  .grid, .steps { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .grid, .steps { grid-template-columns: 1fr; }
+  .nav ul { gap: 14px; }
+  .nav ul li.hide-sm { display: none; }
+  .privacy { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Galaxy home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e062ff"/><stop offset="1" stop-color="#4fa3ff"/></linearGradient></defs><path fill="url(#g)" d="M16 1l3.4 11.6L31 16l-11.6 3.4L16 31l-3.4-11.6L1 16l11.6-3.4z"/></svg>
+      Galaxy
+    </a>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#download">Download</a></li>
+      <li class="hide-sm"><a href="#faq">FAQ</a></li>
+      <li><a href="#privacy">Privacy</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div>
+      <div class="eyebrow">Minecraft Java 26.2 · Fabric</div>
+      <h1>Galaxy Client</h1>
+      <p class="lede">A clean PvP and streamer client with a menu that looks like deep space. <strong>No cheats</strong>, just a sharper HUD, a better F3 screen and the visuals you actually tweak.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="https://github.com/YOUR-GITHUB/galaxy-launcher/releases/latest">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v11.2l4.2-4.2 1.4 1.4L12 18l-5.6-6.6 1.4-1.4 4.2 4.2V3zM5 19h14v2H5z"/></svg>
+          Download for Windows
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/YOUR-GITHUB/galaxy-client">View source</a>
+      </div>
+      <div class="meta">Free · Open source · v1.0.0</div>
+    </div>
+
+    <aside class="f3" aria-label="Preview of the Galaxy debug screen">
+      <div class="f3-top"><span class="f3-fps" id="fps">214 FPS · 144 Hz</span><span class="f3-ver">Minecraft 26.2 · Galaxy</span></div>
+      <section>
+        <h3>POSITION</h3>
+        <div class="row"><span>XYZ</span><span>-128.412 / 71.000 / 309.877</span></div>
+        <div class="row"><span>Facing</span><span>north (-174.2 / 12.5)</span></div>
+        <div class="row"><span>Biome</span><span>cherry_grove</span></div>
+      </section>
+      <section>
+        <h3>SERVER</h3>
+        <div class="row"><span>Server</span><span>hidden</span></div>
+        <div class="row"><span>TPS · Ping</span><span>20.0 · 31 ms</span></div>
+      </section>
+      <section>
+        <h3>PERFORMANCE</h3>
+        <div class="row"><span>Frame</span><span id="frame">4.67 ms</span></div>
+        <div class="row"><span>1% low</span><span>162 FPS</span></div>
+      </section>
+      <p class="f3-cap">The Galaxy F3 screen: grouped, readable, and it hides your server IP while you stream.</p>
+    </aside>
+  </div>
+
+  <section class="block" id="features">
+    <div class="wrap">
+      <div class="eyebrow">What's inside</div>
+      <h2>Built for playing and streaming</h2>
+      <p class="sub">Everything is optional and lives in one menu (Right Shift). Turn on what you use, leave the rest off.</p>
+      <div class="grid">
+        <article class="feat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/></svg>
+          <h3>Galaxy menu</h3>
+          <p>A starfield click GUI with a drifting violet, magenta and blue theme. Six other themes if space isn't your thing.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 4h7v7H4zM13 13h7v7h-7zM16 4h4v4M4 16v4h4"/></svg>
+          <h3>HUD editor</h3>
+          <p>Drag, snap and resize every HUD element with guide lines, then hide what you don't need.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 5h16M4 10h10M4 15h16M4 20h7"/></svg>
+          <h3>Cleaner F3</h3>
+          <p>Position, server, memory and performance in grouped panels, with 1% lows and your GPU at a glance.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M3 7h13v10H3zM16 10l5-3v10l-5-3"/></svg>
+          <h3>Streamer safe</h3>
+          <p>NameProtect, SkinProtect and a hidden server IP, plus a Spotify now-playing HUD.</p>
+          <span class="tag">For clips</span>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2" d="M16 16l5 5"/></svg>
+          <h3>Zoom and FreeLook</h3>
+          <p>Smooth optical zoom and a third-person free camera, plus custom FOV and FullBright.</p>
+        </article>
+        <article class="feat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 3c3 4 5 6 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/></svg>
+          <h3>Visual tweaks</h3>
+          <p>Glint colors, an animated block outline, custom crosshairs, and Low Fire and Low Shield so you can see.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="download">
+    <div class="wrap">
+      <div class="eyebrow">Get started</div>
+      <h2>From download to playing in a minute</h2>
+      <p class="sub">The Galaxy Launcher sets everything up for you and keeps Galaxy up to date.</p>
+      <ol class="steps">
+        <li><h3>Install the launcher</h3><p>Download it from GitHub and run the installer. Windows may ask you to confirm because it's a new app.</p></li>
+        <li><h3>Sign in with Microsoft</h3><p>You sign in on Microsoft's own page. Galaxy never sees your password.</p></li>
+        <li><h3>Press Play Galaxy</h3><p>It installs Fabric, Fabric API and Galaxy for 26.2 and switches the game to OpenGL for you.</p></li>
+      </ol>
+      <div class="req"><span>Windows 10 / 11</span><span>Minecraft: Java Edition</span><span>4 GB RAM</span><span>OpenGL 3.3 GPU</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="faq">
+    <div class="wrap faq">
+      <div class="eyebrow">Questions</div>
+      <h2>FAQ</h2>
+      <details><summary>Can I use Galaxy on servers?</summary><p>Galaxy has no combat automation, ESP or X-ray, so it's meant for normal play. Some servers still limit client mods or features like FreeLook and FullBright, so check each server's rules before you join.</p></details>
+      <details><summary>Why does Galaxy need OpenGL?</summary><p>Minecraft 26.2 uses Vulkan by default. Galaxy's menu and HUD draw with OpenGL, so the launcher sets Graphics API to OpenGL. You can also change it in Options → Video Settings.</p></details>
+      <details><summary>Is it free?</summary><p>Yes. Galaxy is free and the source code is on GitHub.</p></details>
+      <details><summary>Is my account safe?</summary><p>Sign-in goes through Microsoft directly. The launcher only stores the sign-in token Microsoft gives it, on your own PC, so you stay signed in.</p></details>
+      <details><summary>Does it work with other mods?</summary><p>Galaxy is a Fabric mod, so most Fabric mods for 26.2 work alongside it. Add them to the Galaxy profile in the launcher.</p></details>
+    </div>
+  </section>
+
+  <section class="block" id="privacy">
+    <div class="wrap">
+      <div class="eyebrow">Privacy policy</div>
+      <h2>Your data</h2>
+      <div class="privacy">
+        <p class="updated">Last updated: October 7, 2026</p>
+        <p>Galaxy Launcher and Galaxy Client are made by <span class="ph">Funroe</span>. This policy explains what they do with your information.</p>
+        <h3>Microsoft sign-in</h3>
+        <p>When you sign in, Microsoft handles your email and password on its own page. The launcher receives sign-in tokens from Microsoft and Minecraft services so it can start the game. These tokens are stored only on your computer.</p>
+        <h3>What we collect</h3>
+        <ul>
+          <li>We don't run analytics or tracking.</li>
+          <li>We don't sell or share your data.</li>
+          <li>The launcher contacts Microsoft, Mojang, Fabric and GitHub to sign you in, download the game and mods, and check for updates.</li>
+        </ul>
+        <h3>Your settings</h3>
+        <p>Galaxy saves your settings, HUD layout and themes in your Minecraft folder. Delete the launcher's folder and <code>config/galaxyclient</code> to remove them.</p>
+        <h3>Contact</h3>
+        <p>Questions about this policy: <span class="ph">add your contact email or GitHub issues link here</span>.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</p>
+    <p>Galaxy Launcher is based on open-source launcher code. © 2026 Funroe.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var c = document.getElementById('sky'), ctx = c.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stars = [], dpr = Math.min(window.devicePixelRatio || 1, 2);
+  function seed(n) { var s = 7; return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; }
+  var rnd = seed();
+  function resize() {
+    c.width = innerWidth * dpr; c.height = innerHeight * dpr;
+    stars = [];
+    var n = Math.round(innerWidth * innerHeight / 3800);
+    for (var i = 0; i < n; i++) stars.push({ x: rnd(), y: rnd(), r: rnd() < .9 ? .5 + rnd() * .7 : 1.3 + rnd(), t: rnd() * 6.28, s: .6 + rnd() * 1.8 });
+  }
+  function draw(time) {
+    var w = c.width, h = c.height;
+    ctx.clearRect(0, 0, w, h);
+    var g = ctx.createRadialGradient(w * .78, h * .18, 0, w * .78, h * .18, w * .55);
+    g.addColorStop(0, 'rgba(155,92,255,.20)'); g.addColorStop(1, 'rgba(155,92,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    var g2 = ctx.createRadialGradient(w * .12, h * .8, 0, w * .12, h * .8, w * .45);
+    g2.addColorStop(0, 'rgba(79,163,255,.14)'); g2.addColorStop(1, 'rgba(79,163,255,0)');
+    ctx.fillStyle = g2; ctx.fillRect(0, 0, w, h);
+    var tt = (time || 0) / 1000;
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i], a = reduce ? .7 : .45 + .45 * Math.sin(tt * s.s + s.t);
+      ctx.globalAlpha = a; ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r * dpr, 0, 6.283); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  addEventListener('resize', function () { resize(); if (reduce) draw(0); });
+  resize(); requestAnimationFrame(draw);
+
+  if (!reduce) {
+    var fps = document.getElementById('fps'), fr = document.getElementById('frame');
+    setInterval(function () {
+      var v = 196 + Math.round(Math.random() * 34);
+      fps.textContent = v + ' FPS · 144 Hz';
+      fr.textContent = (1000 / v).toFixed(2) + ' ms';
+    }, 1200);
+  }
+})();
+</script>
+</body>
+</html>
